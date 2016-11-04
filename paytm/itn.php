@@ -278,6 +278,7 @@ if( !$pfError && !$pfDone )
 				}
 				
 			   // $DB->insert_record("enrol_paytm", $data );
+			    $fullname = format_string($course->fullname, true, array('context' => $context));
 				$destination = "$CFG->wwwroot/course/view.php?id=$course->id";
 				redirect($destination, get_string('paymentthanks', '', $fullname));
 				break;
