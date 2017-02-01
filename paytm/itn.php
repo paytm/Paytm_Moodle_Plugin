@@ -175,9 +175,11 @@ if( !$pfError && !$pfDone )
 if( !$pfError && !$pfDone )
 {
    //pflog( 'Check status and update order' );
-	$merchant_key = $plugin->get_config( 'merchant_key' );  
+	$merchant_key = $plugin->get_config( 'merchant_key' ); 
+	$merchant_id = $plugin->get_config( 'merchant_id' ); 	
+	$paytm_mode = $plugin->get_config( 'paytm_mode' ); 	
 	$paramList = $pfData;
-	//echo "<pre>"; print_r($paramList);
+	//echo "<pre>"; print_r($paramList); die;
 	$paytmChecksum = isset($paramList["CHECKSUMHASH"]) ? $paramList["CHECKSUMHASH"] : "";
 	$isValidChecksum = verifychecksum_e($paramList, $merchant_key, $paytmChecksum); 
 	
@@ -188,86 +190,81 @@ if( !$pfError && !$pfDone )
 		{
 			case 'TXN_SUCCESS':
 			   // pflog( '- Complete' );
-
-				$coursecontext = context_course::instance($course->id, IGNORE_MISSING);
-
-
-				if ($plugin_instance->enrolperiod) {
-					$timestart = time();
-					$timeend   = $timestart + $plugin_instance->enrolperiod;
-				} else {
-					$timestart = 0;
-					$timeend   = 0;
-				}
-
-				// Enrol user
-				$plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
-
-				// Pass $view=true to filter hidden caps if the user cannot see them
-				if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
-					'', '', '', '', false, true)) {
-					$users = sort_by_roleassignment_authority($users, $context);
-					$teacher = array_shift($users);
-				} else {
-					$teacher = false;
-				}
-
-				$mailstudents = $plugin->get_config('mailstudents');
-				$mailteachers = $plugin->get_config('mailteachers');
-				$mailadmins   = $plugin->get_config('mailadmins');
-				$shortname = format_string($course->shortname, true, array('context' => $context));
-
-
-				if (!empty($mailstudents)) {
-					$a = new stdClass();
-					$a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
-					$a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
-
-					$eventdata = new stdClass();
-					$eventdata->modulename        = 'moodle';
-					$eventdata->component         = 'enrol_paytm';
-					$eventdata->name              = 'paytm_enrolment';
-					$eventdata->userfrom          = empty($teacher) ? get_admin() : $teacher;
-					$eventdata->userto            = $user;
-					$eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
-					$eventdata->fullmessage       = get_string('welcometocoursetext', '', $a);
-					$eventdata->fullmessageformat = FORMAT_PLAIN;
-					$eventdata->fullmessagehtml   = '';
-					$eventdata->smallmessage      = '';
-					message_send($eventdata);
-
-				}
-
-				if (!empty($mailteachers) && !empty($teacher)) {
-					$a->course = format_string($course->fullname, true, array('context' => $coursecontext));
-					$a->user = fullname($user);
-
-					$eventdata = new stdClass();
-					$eventdata->modulename        = 'moodle';
-					$eventdata->component         = 'enrol_paytm';
-					$eventdata->name              = 'paytm_enrolment';
-					$eventdata->userfrom          = $user;
-					$eventdata->userto            = $teacher;
-					$eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
-					$eventdata->fullmessage       = get_string('enrolmentnewuser', 'enrol', $a);
-					$eventdata->fullmessageformat = FORMAT_PLAIN;
-					$eventdata->fullmessagehtml   = '';
-					$eventdata->smallmessage      = '';
-					message_send($eventdata);
-				}
-
-				if ( !empty( $mailadmins ) )
+				
+				// Create an array having all required parameters for status query.
+				$requestParamList = array("MID" => $merchant_id , "ORDERID" => $paramList['ORDERID']);
+				
+				// Call the PG's getTxnStatus() function for verifying the transaction status.
+				if($paytm_mode=='test')
 				{
-					$a->course = format_string($course->fullname, true, array('context' => $coursecontext));
-					$a->user = fullname($user);
-					$admins = get_admins();
-					foreach ($admins as $admin) {
+					$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/TXNSTATUS';
+				}
+				else
+				{
+					$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/TXNSTATUS';
+				}
+				$responseParamList = callAPI($check_status_url, $requestParamList);				
+				if($responseParamList['STATUS']=='TXN_SUCCESS' && $responseParamList['TXNAMOUNT']==$paramList["TXNAMOUNT"])
+				{
+					$coursecontext = context_course::instance($course->id, IGNORE_MISSING);
+
+
+					if ($plugin_instance->enrolperiod) {
+						$timestart = time();
+						$timeend   = $timestart + $plugin_instance->enrolperiod;
+					} else {
+						$timestart = 0;
+						$timeend   = 0;
+					}
+
+					// Enrol user
+					$plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
+
+					// Pass $view=true to filter hidden caps if the user cannot see them
+					if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
+						'', '', '', '', false, true)) {
+						$users = sort_by_roleassignment_authority($users, $context);
+						$teacher = array_shift($users);
+					} else {
+						$teacher = false;
+					}
+
+					$mailstudents = $plugin->get_config('mailstudents');
+					$mailteachers = $plugin->get_config('mailteachers');
+					$mailadmins   = $plugin->get_config('mailadmins');
+					$shortname = format_string($course->shortname, true, array('context' => $context));
+
+
+					if (!empty($mailstudents)) {
+						$a = new stdClass();
+						$a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
+						$a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
+
+						$eventdata = new stdClass();
+						$eventdata->modulename        = 'moodle';
+						$eventdata->component         = 'enrol_paytm';
+						$eventdata->name              = 'paytm_enrolment';
+						$eventdata->userfrom          = empty($teacher) ? get_admin() : $teacher;
+						$eventdata->userto            = $user;
+						$eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
+						$eventdata->fullmessage       = get_string('welcometocoursetext', '', $a);
+						$eventdata->fullmessageformat = FORMAT_PLAIN;
+						$eventdata->fullmessagehtml   = '';
+						$eventdata->smallmessage      = '';
+						message_send($eventdata);
+
+					}
+
+					if (!empty($mailteachers) && !empty($teacher)) {
+						$a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+						$a->user = fullname($user);
+
 						$eventdata = new stdClass();
 						$eventdata->modulename        = 'moodle';
 						$eventdata->component         = 'enrol_paytm';
 						$eventdata->name              = 'paytm_enrolment';
 						$eventdata->userfrom          = $user;
-						$eventdata->userto            = $admin;
+						$eventdata->userto            = $teacher;
 						$eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
 						$eventdata->fullmessage       = get_string('enrolmentnewuser', 'enrol', $a);
 						$eventdata->fullmessageformat = FORMAT_PLAIN;
@@ -275,12 +272,36 @@ if( !$pfError && !$pfDone )
 						$eventdata->smallmessage      = '';
 						message_send($eventdata);
 					}
+
+					if ( !empty( $mailadmins ) )
+					{
+						$a->course = format_string($course->fullname, true, array('context' => $coursecontext));
+						$a->user = fullname($user);
+						$admins = get_admins();
+						foreach ($admins as $admin) {
+							$eventdata = new stdClass();
+							$eventdata->modulename        = 'moodle';
+							$eventdata->component         = 'enrol_paytm';
+							$eventdata->name              = 'paytm_enrolment';
+							$eventdata->userfrom          = $user;
+							$eventdata->userto            = $admin;
+							$eventdata->subject           = get_string("enrolmentnew", 'enrol', $shortname);
+							$eventdata->fullmessage       = get_string('enrolmentnewuser', 'enrol', $a);
+							$eventdata->fullmessageformat = FORMAT_PLAIN;
+							$eventdata->fullmessagehtml   = '';
+							$eventdata->smallmessage      = '';
+							message_send($eventdata);
+						}
+					}
+					$fullname = format_string($course->fullname, true, array('context' => $context));
+				   // $DB->insert_record("enrol_paytm", $data );
+					$destination = "$CFG->wwwroot/course/view.php?id=$course->id";
+					redirect($destination, get_string('paymentthanks', '', $fullname));
 				}
-				
-			   // $DB->insert_record("enrol_paytm", $data );
-			    $fullname = format_string($course->fullname, true, array('context' => $context));
-				$destination = "$CFG->wwwroot/course/view.php?id=$course->id";
-				redirect($destination, get_string('paymentthanks', '', $fullname));
+				else{
+					echo "<b>Security Issue!!! Detected.</b>";
+					exit;
+				}
 				break;
 
 			case 'TXN_FAILURE':
