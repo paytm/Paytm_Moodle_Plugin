@@ -194,16 +194,20 @@ if( !$pfError && !$pfDone )
 				// Create an array having all required parameters for status query.
 				$requestParamList = array("MID" => $merchant_id , "ORDERID" => $paramList['ORDERID']);
 				
+				$StatusCheckSum = getChecksumFromArray($requestParamList, $merchant_key);
+							
+				$requestParamList['CHECKSUMHASH'] = $StatusCheckSum;
+				
 				// Call the PG's getTxnStatus() function for verifying the transaction status.
 				if($paytm_mode=='test')
 				{
-					$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/TXNSTATUS';
+					$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/getTxnStatus';
 				}
 				else
 				{
-					$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/TXNSTATUS';
+					$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/getTxnStatus';
 				}
-				$responseParamList = callAPI($check_status_url, $requestParamList);				
+				$responseParamList = callNewAPI($check_status_url, $requestParamList);				
 				if($responseParamList['STATUS']=='TXN_SUCCESS' && $responseParamList['TXNAMOUNT']==$paramList["TXNAMOUNT"])
 				{
 					$coursecontext = context_course::instance($course->id, IGNORE_MISSING);
