@@ -303,7 +303,7 @@ if( !$pfError && !$pfDone )
 					redirect($destination, get_string('paymentthanks', '', $fullname));
 				}
 				else{
-					echo "<b>Security Issue!!! Detected.</b>";
+					echo "<b>It seems some issue in server to server communication. Kindly connect with administrator.</b>";
 					exit;
 				}
 				break;
