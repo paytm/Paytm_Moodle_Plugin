@@ -66,6 +66,13 @@ $string['paytm_live'] = 'Live Mode';
 $string['paytm_test'] = 'Sandbox Mode';
 $string['paytm_mode'] = 'Paytm Mode';
 $string['paytm_mode_desc'] = 'Testing or Live Mode';
+
+$string['transaction_url'] = 'Paytm Transetion URL';
+$string['transaction_url_desc'] = 'The Transetion URL provided by Paytm';
+
+$string['transaction_status_url'] = 'Paytm Transetion Status URL';
+$string['transaction_status_url_desc'] = 'The Transetion Status URL provided by Paytm';
+
 $string['paytm_callback'] = 'Enable Callback Mode';
 $string['paytm_callback_desc'] = 'Uncheck to disable the callback url';
 $string['paytmaccepted'] = 'Paytm payments accepted';

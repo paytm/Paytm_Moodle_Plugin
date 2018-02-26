@@ -176,7 +176,8 @@ if( !$pfError && !$pfDone )
    //pflog( 'Check status and update order' );
 	$merchant_key = $plugin->get_config( 'merchant_key' ); 
 	$merchant_id = $plugin->get_config( 'merchant_id' ); 	
-	$paytm_mode = $plugin->get_config( 'paytm_mode' ); 	
+	// $paytm_mode = $plugin->get_config( 'paytm_mode' ); 	
+	$transaction_status_url = $plugin->get_config( 'transaction_status_url' ); 	
 	$paramList = $pfData;
 	//echo "<pre>"; print_r($paramList); die;
 	$paytmChecksum = isset($paramList["CHECKSUMHASH"]) ? $paramList["CHECKSUMHASH"] : "";
@@ -198,14 +199,20 @@ if( !$pfError && !$pfDone )
 				$requestParamList['CHECKSUMHASH'] = $StatusCheckSum;
 				
 				// Call the PG's getTxnStatus() function for verifying the transaction status.
-				if($paytm_mode=='test')
-				{
-					$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/getTxnStatus';
-				}
-				else
-				{
-					$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/getTxnStatus';
-				}
+				/*	19751/17Jan2018	*/
+					/*if($paytm_mode=='test') {
+						$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/getTxnStatus';
+					} else {
+						$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/getTxnStatus';
+					}*/
+
+					/*if($paytm_mode=='test') {
+						$check_status_url = 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus';
+					} else {
+						$check_status_url = 'https://securegw.paytm.in/merchant-status/getTxnStatus';
+					}*/
+					$check_status_url = $transaction_status_url;
+				/*	19751/17Jan2018 end	*/
 				$responseParamList = callNewAPI($check_status_url, $requestParamList);				
 				if($responseParamList['STATUS']=='TXN_SUCCESS' && $responseParamList['TXNAMOUNT']==$paramList["TXNAMOUNT"])
 				{

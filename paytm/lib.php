@@ -213,19 +213,22 @@ class enrol_paytm_plugin extends enrol_plugin {
                 $userfirstname   = $USER->firstname;
                 $userlastname    = $USER->lastname;
                 $instancename    = $this->get_instance_name($instance);
+                /*  19751/17Jan2018 */
+                    /*if ( $this->get_config( 'paytm_mode' ) == 'live' ) {
+                        $paytmurl = 'https://secure.paytm.in/oltp-web/processTransaction';
+                    } else {
+                        $paytmurl = 'https://pguat.paytm.com/oltp-web/processTransaction';
+                    }*/
 
-                if ( $this->get_config( 'paytm_mode' ) == 'live' )
-                {
-                    $paytmurl = 'https://secure.paytm.in/oltp-web/processTransaction';
-                    $merchant_id = $this->get_config( 'merchant_id' );
-                    $merchant_key = $this->get_config( 'merchant_key' );
-                }
-                else
-                {
-                    $paytmurl = 'https://pguat.paytm.com/oltp-web/processTransaction';
-                    $merchant_id = $this->get_config( 'merchant_id' );
-                    $merchant_key = $this->get_config( 'merchant_key' );
-                }
+                    /*if ( $this->get_config( 'paytm_mode' ) == 'live' ) {
+                        $paytmurl = 'https://securegw.paytm.in/theia/processTransaction';
+                    } else {
+                        $paytmurl = 'https://securegw-stage.paytm.in/theia/processTransaction';
+                    }*/
+                    $paytmurl = $this->get_config( 'transaction_url' );
+                /*  19751/17Jan2018 end */
+                $merchant_id = $this->get_config( 'merchant_id' );
+                $merchant_key = $this->get_config( 'merchant_key' );
 
 
                 $formArray = array(
