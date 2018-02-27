@@ -20,3 +20,12 @@ Configuration
 - You should choose the Paytm Environment (either to Sandbox or Production)
 - Enter paytm Merchant Key, Merchant ID, website in the listed parameters on configuration tab. These parameters are Mandatory.
 - Click on save.
+
+# Paytm PG URL Details
+	staging	
+		Transaction URL             => https://securegw-stage.paytm.in/theia/processTransaction
+		Transaction Status Url      => https://securegw-stage.paytm.in/merchant-status/getTxnStatus
+
+	Production
+		Transaction URL             => https://securegw.paytm.in/theia/processTransaction
+		Transaction Status Url      => https://securegw.paytm.in/merchant-status/getTxnStatus
