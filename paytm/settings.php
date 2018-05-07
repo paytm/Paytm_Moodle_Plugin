@@ -48,8 +48,8 @@ if ($ADMIN->fulltree) {
     );
     $settings->add(new admin_setting_configselect('enrol_paytm/paytm_mode', get_string('paytm_mode', 'enrol_paytm'), get_string('paytm_mode_desc', 'enrol_paytm'), 'test', $options));*/
 
-    $settings->add(new admin_setting_configtext('enrol_paytm/transaction_url', get_string( 'transaction_url', 'enrol_paytm'), get_string('transaction_url_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
-    $settings->add(new admin_setting_configtext('enrol_paytm/transaction_status_url', get_string( 'transaction_status_url', 'enrol_paytm'), get_string('transaction_status_url_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
+    $settings->add(new admin_setting_configtext('enrol_paytm/transaction_url', get_string( 'transaction_url', 'enrol_paytm'), get_string('transaction_url_desc', 'enrol_paytm'), '', 0));
+    $settings->add(new admin_setting_configtext('enrol_paytm/transaction_status_url', get_string( 'transaction_status_url', 'enrol_paytm'), get_string('transaction_status_url_desc', 'enrol_paytm'), '', 0));
 
     $settings->add(new admin_setting_configcheckbox('enrol_paytm/paytm_callback', get_string('paytm_callback', 'enrol_paytm'),  get_string('paytm_callback_desc', 'enrol_paytm'), 1));
 
