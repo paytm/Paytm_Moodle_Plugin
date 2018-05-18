@@ -32,7 +32,8 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configtext('enrol_paytm/merchant_id', get_string( 'merchant_id', 'enrol_paytm'), get_string('merchant_id_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
 
-    $settings->add(new admin_setting_configtext('enrol_paytm/merchant_key', get_string( 'merchant_key', 'enrol_paytm'), get_string('merchant_key_desc', 'enrol_paytm'), '', '/^[a-zA-Z0-9-\(\)@.,_:#\/ ]*$/'));
+    // $settings->add(new admin_setting_configtext('enrol_paytm/merchant_key', get_string( 'merchant_key', 'enrol_paytm'), get_string('merchant_key_desc', 'enrol_paytm'), '', '/^[a-zA-Z0-9-\(\)@.,_:#\/ ]*$/'));
+    $settings->add(new admin_setting_configtext('enrol_paytm/merchant_key', get_string( 'merchant_key', 'enrol_paytm'), get_string('merchant_key_desc', 'enrol_paytm'), '', PARAM_RAW_TRIMMED));
     
 	$settings->add(new admin_setting_configtext('enrol_paytm/merchant_website', get_string( 'merchant_website', 'enrol_paytm'), get_string('merchant_website_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
 	
