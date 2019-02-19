@@ -1,0 +1,25 @@
+
+<div align="center">
+
+<p><?php print_string("paymentrequired") ?></p>
+<p><b><?php echo $instancename; ?></b></p>
+<p><b><?php echo get_string("cost").": {$instance->currency} {$localisedcost}"; ?></b></p>
+<p><img alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="<?php echo $CFG->wwwroot.'/enrol/paytm/paytm.png'?>" /></p>
+<p><?php print_string("paymentinstant") ?></p>
+<?php
+
+?>
+
+<form action="<?php echo $paytmurl ?>" method="post">
+<?php
+//echo "<pre>"; print_r($formArray); die;
+    foreach( $formArray as $k=>$v )
+    {
+   ?> <input type="hidden" name="<?php p($k) ?>" value="<?php p($v) ?>" />    <?php
+    }
+    ?>
+	<input type="submit" value="<?php print_string("sendpaymentbutton", "enrol_paytm") ?>" />
+
+</form>
+
+</div>
