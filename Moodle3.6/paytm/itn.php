@@ -250,7 +250,8 @@ if( !$pfError && !$pfDone )
 						$a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
 						$a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
 
-						$eventdata = new stdClass();
+						$eventdata 					  = new \core\message\message();
+            			$eventdata->courseid          = $course->id;
 						$eventdata->modulename        = 'moodle';
 						$eventdata->component         = 'enrol_paytm';
 						$eventdata->name              = 'paytm_enrolment';
@@ -269,7 +270,7 @@ if( !$pfError && !$pfDone )
 						$a->course = format_string($course->fullname, true, array('context' => $coursecontext));
 						$a->user = fullname($user);
 
-						$eventdata = new stdClass();
+						$eventdata 					  = new \core\message\message();
 						$eventdata->modulename        = 'moodle';
 						$eventdata->component         = 'enrol_paytm';
 						$eventdata->name              = 'paytm_enrolment';
@@ -289,7 +290,7 @@ if( !$pfError && !$pfDone )
 						$a->user = fullname($user);
 						$admins = get_admins();
 						foreach ($admins as $admin) {
-							$eventdata = new stdClass();
+							$eventdata 					  = new \core\message\message();
 							$eventdata->modulename        = 'moodle';
 							$eventdata->component         = 'enrol_paytm';
 							$eventdata->name              = 'paytm_enrolment';
@@ -326,7 +327,7 @@ if( !$pfError && !$pfDone )
 			case 'OPEN':
 				//pflog( '- Pending' );
 
-				$eventdata = new stdClass();
+				$eventdata 					  = new \core\message\message();
 				$eventdata->modulename        = 'moodle';
 				$eventdata->component         = 'enrol_paytm';
 				$eventdata->name              = 'paytm_enrolment';
@@ -379,7 +380,7 @@ function message_paytm_error_to_admin($subject, $data) {
         $message .= "$key => $value\n";
     }
 
-    $eventdata = new stdClass();
+    $eventdata 					  = new \core\message\message();
     $eventdata->modulename        = 'moodle';
     $eventdata->component         = 'enrol_paytm';
     $eventdata->name              = 'paytm_enrolment';
