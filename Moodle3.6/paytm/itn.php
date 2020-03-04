@@ -147,7 +147,7 @@ if( !$pfError && !$pfDone ) {
 						$timeend   = 0;
 					}
 					// Enrol user
-					$plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend)
+					$plugin->enrol_user($plugin_instance, $user->id, $plugin_instance->roleid, $timestart, $timeend);
 					// Pass $view=true to filter hidden caps if the user cannot see them
 					if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
 						'', '', '', '', false, true)) {
