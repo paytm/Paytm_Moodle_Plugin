@@ -1,8 +1,8 @@
 <?php
 /**
- * payfast_common.inc
+ * paytm_common.inc
  *
- * Copyright (c) 2009-2012 PayFast (Pty) Ltd
+ * Copyright (c) 2009-2020 Paytm (Pvt) Ltd
  * 
  * LICENSE:
  * 
@@ -16,17 +16,17 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  * 
- * @author     Jonathan Smit
- * @copyright  2009-2012 PayFast (Pty) Ltd
+ * @author     Abhishek Awasthi
+ * @copyright  2009-2012 Paytm 
  * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
  */
 
 //// Create user agent string
 // User agent constituents (for cURL)
 define( 'PF_SOFTWARE_NAME', 'Moodle' );
-define( 'PF_SOFTWARE_VER', "2015011300" );
+define( 'PF_SOFTWARE_VER', "2020011300" );
 define( 'PF_MODULE_NAME', 'Paytm-Moodle' );
-define( 'PF_MODULE_VER', '2015011300' );
+define( 'PF_MODULE_VER', '2020011300' );
 
 // Features
 // - PHP

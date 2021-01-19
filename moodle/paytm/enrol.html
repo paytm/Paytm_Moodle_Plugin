@@ -1,0 +1,112 @@
+
+<div align="center">
+
+    <p><?php print_string("paymentrequired") ?></p>
+    <p><b><?php echo $instancename; ?></b></p>
+    <p><b><?php echo get_string("cost").": {$instance->currency} {$localisedcost}"; ?></b></p>
+    <p><img alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="<?php echo $CFG->wwwroot.'/enrol/paytm/paytm.png'?>" /></p>
+    <p><?php print_string("paymentinstant") ?></p>
+    <?php
+
+    ?>
+
+    <script type="application/javascript" crossorigin="anonymous" src="<?php echo $formArray['PAYTM_ENV_DOMAIN']; ?>merchantpgpui/checkoutjs/merchants/<?php echo $formArray['MID']; ?>.js"></script>
+        <?php
+        //echo "<pre>"; print_r($formArray); die;
+        $orderid = $formArray['ORDER_ID'];
+        $tnx_token = $formArray['TXN_TOKEN'];
+        $amount = $formArray['TXN_AMOUNT'];
+        $msg = $formArray['MESSAGE'];
+        foreach( $formArray as $k=>$v )
+        {
+        ?>   <?php
+        }
+        ?>
+        <input type="button" id="JS_heckout"  onclick="openBlinkCheckoutPopup();"  value="<?php print_string("sendpaymentbutton", "enrol_paytm") ?>" />
+       <style type="text/css">
+        #paytm-pg-spinner {margin-left:35%;margin-top:-25%;width: 70px;text-align: center;z-index: 999999;position: relative;display: none}
+
+        #paytm-pg-spinner > div {width: 10px;height: 10px;background-color: #012b71;border-radius: 100%;display: inline-block;-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;animation: sk-bouncedelay 1.4s infinite ease-in-out both;}
+
+        #paytm-pg-spinner .bounce1 {-webkit-animation-delay: -0.64s;animation-delay: -0.64s;}
+
+        #paytm-pg-spinner .bounce2 {-webkit-animation-delay: -0.48s;animation-delay: -0.48s;}
+        #paytm-pg-spinner .bounce3 {-webkit-animation-delay: -0.32s;animation-delay: -0.32s;}
+
+        #paytm-pg-spinner .bounce4 {-webkit-animation-delay: -0.16s;animation-delay: -0.16s;}
+        #paytm-pg-spinner .bounce4, #paytm-pg-spinner .bounce5{background-color: #48baf5;} 
+        @-webkit-keyframes sk-bouncedelay {0%, 80%, 100% { -webkit-transform: scale(0) }40% { -webkit-transform: scale(1.0) }}
+
+        @keyframes sk-bouncedelay { 0%, 80%, 100% { -webkit-transform: scale(0);transform: scale(0); } 40% { 
+                                        -webkit-transform: scale(1.0); transform: scale(1.0);}}
+        .paytm-overlay{z-index:9999999999;left:0;width: 100%;position: fixed;top: 0px;opacity: .4;height: 100%;background: #000;display: none;}
+        #paytmError{
+            color:red !important;
+        }
+
+        </style>
+
+        <script>
+        
+        function openBlinkCheckoutPopup() {
+            var loaderhtml = '<div id="paytm-pg-spinner" class="paytm-pg-loader">'+
+            '<div class="bounce1"></div>'+
+            '<div class="bounce2"></div>'+
+            '<div class="bounce3"></div>'+
+            '<div class="bounce4"></div>'+
+            '<div class="bounce5"></div>'+
+            '</div>'+
+            '<div class="paytm-overlay paytm-pg-loader"></div>';
+            jQuery('body').append(loaderhtml);
+             if(document.getElementById("paytmError")!==null){ 
+                 document.getElementById("paytmError").remove(); 
+                }
+            var txn_token = '<?php echo $tnx_token; ?>';
+            if(txn_token){
+               jQuery('.paytm-pg-loader').show();
+                var config = {
+                "root": "",
+                    "flow": "DEFAULT",
+                    "data": {
+                    "orderId": '<?php echo $orderid; ?>',
+                        "token": '<?php echo $tnx_token; ?>',
+                        "tokenType": "TXN_TOKEN",
+                        "amount": '<?php echo $amount; ?>',
+                },
+                "merchant": {
+                    "redirect": true
+                },
+                "handler": {
+                   
+                    "notifyMerchant": function (eventName, data) {
+                        if(eventName == 'SESSION_EXPIRED' || eventName == 'APP_CLOSED'){
+                        location.reload(); 
+                        }
+                    }
+                }
+            };
+            if (window.Paytm && window.Paytm.CheckoutJS) {
+                // initialze configuration using init method 
+                window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
+                    // after successfully updating configuration, invoke checkoutjs
+                    window.Paytm.CheckoutJS.invoke();
+
+                }).catch(function onError(error) {
+                    //console.log("error => ", error);
+                });
+            }
+
+
+            }else{
+                jQuery("#JS_heckout").after('<p id="paytmError"></p>');
+                document.getElementById("paytmError").innerHTML = "<?php echo $msg; ?>";
+            }
+
+
+        }
+
+        </script>
+
+
+
+        </div>

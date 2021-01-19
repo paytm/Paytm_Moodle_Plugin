@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -20,12 +21,12 @@
  * This plugin allows you to set up paid courses.
  *
  * @package    enrol_paytm
- * @copyright  2010 Eugene Venter
+ * @copyright  2020 Paytm
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-require_once( "encdec_paytm.php" );
+require_once( "PaytmChecksum.php" );
+require_once("PaytmHelper.php");
 
 /**
  * Paypal enrolment plugin implementation.
@@ -89,12 +90,12 @@ class enrol_paytm_plugin extends enrol_plugin {
      */
     public function add_course_navigation($instancesnode, stdClass $instance) {
         if ($instance->enrol !== 'paytm') {
-             throw new coding_exception('Invalid enrol instance type!');
+            throw new coding_exception('Invalid enrol instance type!');
         }
 
         $context = context_course::instance($instance->courseid);
         if (has_capability('enrol/paytm:config', $context)) {
-            $managelink = new moodle_url('/enrol/paytm/edit.php', array('courseid'=>$instance->courseid, 'id'=>$instance->id));
+            $managelink = new moodle_url('/enrol/paytm/edit.php', array('courseid' => $instance->courseid, 'id' => $instance->id));
             $instancesnode->add($this->get_instance_name($instance), $managelink, navigation_node::TYPE_SETTING);
         }
     }
@@ -115,9 +116,9 @@ class enrol_paytm_plugin extends enrol_plugin {
         $icons = array();
 
         if (has_capability('enrol/paytm:config', $context)) {
-            $editlink = new moodle_url("/enrol/paytm/edit.php", array('courseid'=>$instance->courseid, 'id'=>$instance->id));
+            $editlink = new moodle_url("/enrol/paytm/edit.php", array('courseid' => $instance->courseid, 'id' => $instance->id));
             $icons[] = $OUTPUT->action_icon($editlink, new pix_icon('t/edit', get_string('edit'), 'core',
-                    array('class' => 'iconsmall')));
+                            array('class' => 'iconsmall')));
         }
 
         return $icons;
@@ -131,12 +132,12 @@ class enrol_paytm_plugin extends enrol_plugin {
     public function get_newinstance_link($courseid) {
         $context = context_course::instance($courseid, MUST_EXIST);
 
-        if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/paytm:config', $context)) {
+        if (!has_capability('moodle/course:enrolconfig', $context) or!has_capability('enrol/paytm:config', $context)) {
             return NULL;
         }
 
         // multiple instances supported - different cost for different roles
-        return new moodle_url('/enrol/paytm/edit.php', array('courseid'=>$courseid));
+        return new moodle_url('/enrol/paytm/edit.php', array('courseid' => $courseid));
     }
 
     /**
@@ -151,7 +152,7 @@ class enrol_paytm_plugin extends enrol_plugin {
 
         ob_start();
 
-        if ($DB->record_exists('user_enrolments', array('userid'=>$USER->id, 'enrolid'=>$instance->id))) {
+        if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
             return ob_get_clean();
         }
 
@@ -163,7 +164,7 @@ class enrol_paytm_plugin extends enrol_plugin {
             return ob_get_clean();
         }
 
-        $course = $DB->get_record('course', array('id'=>$instance->courseid));
+        $course = $DB->get_record('course', array('id' => $instance->courseid));
         $context = context_course::instance($course->id);
 
         $shortname = format_string($course->shortname, true, array('context' => $context));
@@ -172,21 +173,21 @@ class enrol_paytm_plugin extends enrol_plugin {
 
         // Pass $view=true to filter hidden caps if the user cannot see them
         if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
-                                             '', '', '', '', false, true)) {
+                '', '', '', '', false, true)) {
             $users = sort_by_roleassignment_authority($users, $context);
             $teacher = array_shift($users);
         } else {
             $teacher = false;
         }
 
-        if ( (float) $instance->cost <= 0 ) {
+        if ((float) $instance->cost <= 0) {
             $cost = (float) $this->get_config('cost');
         } else {
             $cost = (float) $instance->cost;
         }
 
         if (abs($cost) < 0.01) { // no cost, other enrolment methods (instances) should be used
-            echo '<p>'.get_string('nocost', 'enrol_paytm').'</p>';
+            echo '<p>' . get_string('nocost', 'enrol_paytm') . '</p>';
         } else {
 
             // Calculate localised and "." cost, make sure we send PayPal the same value,
@@ -202,75 +203,93 @@ class enrol_paytm_plugin extends enrol_plugin {
                     // in unencrypted connection...
                     $wwwroot = str_replace("http://", "https://", $CFG->wwwroot);
                 }
-                echo '<div class="mdl-align"><p>'.get_string('paymentrequired').'</p>';
-                echo '<p><b>'.get_string('cost').": $instance->currency $localisedcost".'</b></p>';
-                echo '<p><a href="'.$wwwroot.'/login/">'.get_string('loginsite').'</a></p>';
+                echo '<div class="mdl-align"><p>' . get_string('paymentrequired') . '</p>';
+                echo '<p><b>' . get_string('cost') . ": $instance->currency $localisedcost" . '</b></p>';
+                echo '<p><a href="' . $wwwroot . '/login/">' . get_string('loginsite') . '</a></p>';
                 echo '</div>';
             } else {
                 //Sanitise some fields before building the PayPal form
-                $coursefullname  = format_string($course->fullname, true, array('context'=>$context));
+                $coursefullname = format_string($course->fullname, true, array('context' => $context));
                 $courseshortname = $shortname;
-                $userfirstname   = $USER->firstname;
-                $userlastname    = $USER->lastname;
-                $instancename    = $this->get_instance_name($instance);
-                /*  19751/17Jan2018 */
-                    /*if ( $this->get_config( 'paytm_mode' ) == 'live' ) {
-                        $paytmurl = 'https://secure.paytm.in/oltp-web/processTransaction';
-                    } else {
-                        $paytmurl = 'https://pguat.paytm.com/oltp-web/processTransaction';
-                    }*/
-
-                    /*if ( $this->get_config( 'paytm_mode' ) == 'live' ) {
-                        $paytmurl = 'https://securegw.paytm.in/theia/processTransaction';
-                    } else {
-                        $paytmurl = 'https://securegw-stage.paytm.in/theia/processTransaction';
-                    }*/
-                    $paytmurl = $this->get_config( 'transaction_url' );
-                /*  19751/17Jan2018 end */
-                $merchant_id = $this->get_config( 'merchant_id' );
-                $merchant_key = $this->get_config( 'merchant_key' );
+                $userfirstname = $USER->firstname;
+                $userlastname = $USER->lastname;
+                $instancename = $this->get_instance_name($instance);
+                /*  /20Nov2020 */
+                // Abhishek Awasthi //
+                if ($this->get_config('paytm_mode') == 'live') {
+                    $env_paytm=1;
+                } else {
+                     $env_paytm=0;
+                }
+               
+                $merchant_id = $this->get_config('merchant_id');
+                $merchant_key = $this->get_config('merchant_key');
 
 
                 $formArray = array(
-                    /*'return_url'=> $CFG->wwwroot.'/enrol/payfast/return.php?id='.$course->id,
-                    'cancel_url' => $CFG->wwwroot,
-                    'notify_url' => $CFG->wwwroot.'/enrol/payfast/itn.php',
-                    'name_first' => $userfirstname,
-                    'name_last' => $userlastname,
-                    'email_address'=> $USER->email,
-                    'm_payment_id' => "{$USER->id}-{$course->id}-{$instance->id}",
-                    'amount' => $cost,
-                    'item_name' => html_entity_decode( $courseshortname ),
-                    'item_description' => html_entity_decode( $coursefullname ),*/
-					"MID" => $this->get_config( 'merchant_id' ),
-					"MERC_UNQ_REF" => "{$USER->id}-{$course->id}-{$instance->id}",
-					"ORDER_ID" => uniqid("ORDR_"),
-					"CUST_ID" => $USER->email,
-					"WEBSITE" => $this->get_config( 'merchant_website' ),
-					"INDUSTRY_TYPE_ID" => $this->get_config( 'merchant_industrytype' ),
-					"EMAIL" => $USER->email,
-					"CHANNEL_ID" => $this->get_config( 'merchant_channelid' ),
-					"TXN_AMOUNT" => $cost,
-					//"CALLBACK_URL" => $CFG->wwwroot.'/enrol/paytm/itn.php',
+                    "MID" => $this->get_config('merchant_id'),
+                    "MERC_UNQ_REF" => "{$USER->id}-{$course->id}-{$instance->id}",
+                    "ORDER_ID" => uniqid("ORDR_"),
+                    "CUST_ID" => $USER->email,
+                    "WEBSITE" => $this->get_config('merchant_website'),
+                    "INDUSTRY_TYPE_ID" => $this->get_config('merchant_industrytype'),
+                    "EMAIL" => $USER->email,
+                    "CHANNEL_ID" => $this->get_config('merchant_channelid'),
+                    "TXN_AMOUNT" => $cost,
+                    "PAYTM_ENV_DOMAIN" => PaytmHelper::getPaytmHostURL($env_paytm),
+                        //"CALLBACK_URL" => $CFG->wwwroot.'/enrol/paytm/itn.php',
                 );
-				
-				if($this->get_config( 'paytm_callback' ) == '1')
-				{
-					$formArray["CALLBACK_URL"] = $CFG->wwwroot.'/enrol/paytm/itn.php';
-				}
-				
-				
+                if ($this->get_config('paytm_callback') == '1') {
+                    $formArray["CALLBACK_URL"] = $CFG->wwwroot . '/enrol/paytm/itn.php';
+                }
 
-                $checksum = getChecksumFromArray($formArray,$merchant_key);
-			    $formArray['CHECKSUMHASH']=$checksum;
-
-                include( $CFG->dirroot.'/enrol/paytm/enrol.html' );
+               $data =  $this->blinkCheckoutSend($formArray,$env_paytm);
+               $formArray['TXN_TOKEN'] = $data['txn_token'];
+               $formArray['MESSAGE'] = $data['message'];
+               include( $CFG->dirroot . '/enrol/paytm/enrol.html' );
             }
-
         }
 
-        return $OUTPUT->box( ob_get_clean() );
+        return $OUTPUT->box(ob_get_clean());
     }
+
+
+   private function blinkCheckoutSend($paramData = array(),$env_paytm=1){
+                    $paytmParams["body"] = array(
+                    "requestType" => "Payment",
+                    "mid" => $paramData["MID"],
+                    "websiteName" => $paramData["WEBSITE"],
+                    "orderId" => $paramData["ORDER_ID"],
+                    "callbackUrl" => $paramData["CALLBACK_URL"],
+                    "txnAmount" => array(
+                        "value" => $paramData["TXN_AMOUNT"],
+                        "currency" => "INR",
+                    ),
+                    "userInfo" => array(
+                        "custId" => $paramData["CUST_ID"],
+                    ),
+                    "extendInfo" => array(
+                        "mercUnqRef" => $paramData["MERC_UNQ_REF"],
+                    ),
+                );
+                $apiURL = PaytmHelper::getPaytmURL(PaytmConstants::INITIATE_TRANSACTION_URL, $env_paytm) . '?mid='.$paramData['MID'].'&orderId='.$paramData['ORDER_ID'];
+                $generateSignature = PaytmChecksum::generateSignature(json_encode($paytmParams['body'], JSON_UNESCAPED_SLASHES), $this->get_config('merchant_key'));
+                $paytmParams["head"] = array(
+                    "signature" => $generateSignature
+                );
+                $response = PaytmHelper::executecUrl($apiURL, $paytmParams);
+                if(isset($response['body']['txnToken']) && !empty($response['body']['txnToken'])){
+                    $data['txn_token'] = $response['body']['txnToken'];
+                    $data['message'] = PaytmConstants::SUCCESS_TXN_TOKEN;
+
+                }else{
+                    $data['txn_token'] = '';
+                    $data['message'] = PaytmConstants::RESPONSE_ERROR;
+                }
+                
+                return $data;
+
+   }
 
     /**
      * Restore instance and map settings.
@@ -286,18 +305,18 @@ class enrol_paytm_plugin extends enrol_plugin {
             $merge = false;
         } else {
             $merge = array(
-                'courseid'   => $data->courseid,
-                'enrol'      => $this->get_name(),
-                'roleid'     => $data->roleid,
-                'cost'       => $data->cost,
-                'currency'   => $data->currency,
+                'courseid' => $data->courseid,
+                'enrol' => $this->get_name(),
+                'roleid' => $data->roleid,
+                'cost' => $data->cost,
+                'currency' => $data->currency,
             );
         }
         if ($merge and $instances = $DB->get_records('enrol', $merge, 'id')) {
             $instance = reset($instances);
             $instanceid = $instance->id;
         } else {
-            $instanceid = $this->add_instance($course, (array)$data);
+            $instanceid = $this->add_instance($course, (array) $data);
         }
         $step->set_mapping('enrol', $oldid, $instanceid);
     }
@@ -330,11 +349,11 @@ class enrol_paytm_plugin extends enrol_plugin {
         $params['ue'] = $ue->id;
         if ($this->allow_unenrol($instance) && has_capability("enrol/paytm:unenrol", $context)) {
             $url = new moodle_url('/enrol/unenroluser.php', $params);
-            $actions[] = new user_enrolment_action(new pix_icon('t/delete', ''), get_string('unenrol', 'enrol'), $url, array('class'=>'unenrollink', 'rel'=>$ue->id));
+            $actions[] = new user_enrolment_action(new pix_icon('t/delete', ''), get_string('unenrol', 'enrol'), $url, array('class' => 'unenrollink', 'rel' => $ue->id));
         }
         if ($this->allow_manage($instance) && has_capability("enrol/paytm:manage", $context)) {
             $url = new moodle_url('/enrol/editenrolment.php', $params);
-            $actions[] = new user_enrolment_action(new pix_icon('t/edit', ''), get_string('edit'), $url, array('class'=>'editenrollink', 'rel'=>$ue->id));
+            $actions[] = new user_enrolment_action(new pix_icon('t/edit', ''), get_string('edit'), $url, array('class' => 'editenrollink', 'rel' => $ue->id));
         }
         return $actions;
     }
@@ -375,4 +394,5 @@ class enrol_paytm_plugin extends enrol_plugin {
         $context = context_course::instance($instance->courseid);
         return has_capability('enrol/paytm:config', $context);
     }
+
 }
