@@ -22,13 +22,4 @@ The aim of this document is to explain the procedure of installation and configu
 - Enter paytm Merchant Key, Merchant ID, website in the listed parameters on configuration tab. These parameters are Mandatory.
 - Click on save.
 
-## Paytm PG URL Details
-	staging	
-		Transaction URL             => https://securegw-stage.paytm.in/theia/processTransaction
-		Transaction Status Url      => https://securegw-stage.paytm.in/merchant-status/getTxnStatus
 
-	Production
-		Transaction URL             => https://securegw.paytm.in/theia/processTransaction
-		Transaction Status Url      => https://securegw.paytm.in/merchant-status/getTxnStatus
-
-See Video : https://www.youtube.com/watch?v=c4Y6RNlbg2c
