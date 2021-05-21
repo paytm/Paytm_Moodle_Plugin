@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 require_once( "PaytmChecksum.php" );
 require_once("PaytmHelper.php");
+require($CFG->dirroot.'/version.php');
 
 /**
  * Paypal enrolment plugin implementation.
@@ -246,6 +247,10 @@ class enrol_paytm_plugin extends enrol_plugin {
                $data =  $this->blinkCheckoutSend($formArray,$env_paytm);
                $formArray['TXN_TOKEN'] = $data['txn_token'];
                $formArray['MESSAGE'] = $data['message'];
+               $formArray['plugin_version'] = PaytmConstants::PLUGIN_VERSION;
+               $arr = explode("+", $CFG->release);
+                $release = $arr[0];
+               $formArray['moodle_version'] = $release;
                include( $CFG->dirroot . '/enrol/paytm/enrol.html' );
             }
         }
@@ -281,10 +286,16 @@ class enrol_paytm_plugin extends enrol_plugin {
                 if(isset($response['body']['txnToken']) && !empty($response['body']['txnToken'])){
                     $data['txn_token'] = $response['body']['txnToken'];
                     $data['message'] = PaytmConstants::SUCCESS_TXN_TOKEN;
+                    $data['plugin_version'] = PaytmConstants::PLUGIN_VERSION;
+                    $CFG->target_release = $release;
+                    $data['moolde_version'] = $release;
 
                 }else{
                     $data['txn_token'] = '';
                     $data['message'] = PaytmConstants::RESPONSE_ERROR;
+                    $data['plugin_version'] = PaytmConstants::PLUGIN_VERSION;
+                    $CFG->target_release = $release;
+                    $data['moolde_version'] = $release;
                 }
                 
                 return $data;

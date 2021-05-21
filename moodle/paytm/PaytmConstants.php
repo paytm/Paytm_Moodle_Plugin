@@ -69,6 +69,8 @@ class PaytmConstants{
 	CONST ERROR_CURL_DISABLED				= "cURL is not enabled properly. Please verify.";
 	CONST ERROR_CURL_WARNING				= "Your server is unable to connect with us. Please contact to Paytm Support.";
 
+	CONST PLUGIN_VERSION						= "2.0";
+
 
 
 }
