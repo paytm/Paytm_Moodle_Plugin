@@ -289,15 +289,19 @@ class enrol_paytm_plugin extends enrol_plugin {
                     $data['txn_token'] = $response['body']['txnToken'];
                     $data['message'] = PaytmConstants::SUCCESS_TXN_TOKEN;
                     $data['plugin_version'] = PaytmConstants::PLUGIN_VERSION;
+                    if(isset($release) && !empty($release)){
                     $CFG->target_release = $release;
                     $data['moolde_version'] = $release;
-
+                    }
+                   
                 }else{
                     $data['txn_token'] = '';
                     $data['message'] = PaytmConstants::RESPONSE_ERROR;
                     $data['plugin_version'] = PaytmConstants::PLUGIN_VERSION;
+                    if(isset($release) && !empty($release)){
                     $CFG->target_release = $release;
                     $data['moolde_version'] = $release;
+                    }
                 }
                 
                 return $data;
