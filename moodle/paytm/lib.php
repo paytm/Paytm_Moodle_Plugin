@@ -283,6 +283,8 @@ class enrol_paytm_plugin extends enrol_plugin {
                     "signature" => $generateSignature
                 );
                 $response = PaytmHelper::executecUrl($apiURL, $paytmParams);
+                $arr = explode("+", $CFG->release);
+                $release = $arr[0];
                 if(isset($response['body']['txnToken']) && !empty($response['body']['txnToken'])){
                     $data['txn_token'] = $response['body']['txnToken'];
                     $data['message'] = PaytmConstants::SUCCESS_TXN_TOKEN;
