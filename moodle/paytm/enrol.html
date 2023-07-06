@@ -4,7 +4,9 @@
     <p><?php print_string("paymentrequired") ?></p>
     <p><b><?php echo $instancename; ?></b></p>
     <p><b><?php echo get_string("cost").": {$instance->currency} {$localisedcost}"; ?></b></p>
-    <p><img alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="<?php echo $CFG->wwwroot.'/enrol/paytm/paytm_logo.png'?>" /></br><img alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="<?php echo $CFG->wwwroot.'/enrol/paytm/paytm_detail.png'?>" /></p>
+    <p><img width="300px" height="45px" alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="https://staticpg.paytm.in/pg_plugins_logo/paytm_logo_paymodes.svg" /></br>
+        <!-- <img alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="<?php echo $CFG->wwwroot.'/enrol/paytm/paytm_detail.png'?>" /> -->
+    </p>
     <p><?php print_string("paymentinstant") ?></p>
     <?php
 

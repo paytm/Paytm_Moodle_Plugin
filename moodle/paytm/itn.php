@@ -140,6 +140,7 @@ if (!$pfError && !$pfDone) {
     $v = PaytmChecksum::verifySignature($_POST, $merchant_key, $paytmChecksum);
     $transaction_id = $pfData['TXNID'];
     if ($v == '1' || $v == 'true') {
+        
         switch ($pfData['STATUS']) {
             case 'TXN_SUCCESS':
                 // Create an array having all required parameters for status query.
@@ -165,7 +166,8 @@ if (!$pfError && !$pfDone) {
                 } else {
                      $PAYTM_ENV = 0;
                 }
-                $responseStatusArray = PaytmHelper::executecUrl(PaytmHelper::getPaytmURL(PaytmConstants::ORDER_STATUS_URL,$PAYTM_ENV), $paytmParamsStatus);			
+                $responseStatusArray = PaytmHelper::executecUrl(PaytmHelper::getPaytmURL(PaytmConstants::ORDER_STATUS_URL,$PAYTM_ENV), $paytmParamsStatus);
+                		
                 if ($responseStatusArray['body']['resultInfo']['resultStatus'] == 'TXN_SUCCESS' && $responseStatusArray['body']['txnAmount'] == $pfData["TXNAMOUNT"]) {
                     $coursecontext = context_course::instance($course->id, IGNORE_MISSING);
                     if ($plugin_instance->enrolperiod) {
@@ -185,15 +187,17 @@ if (!$pfError && !$pfDone) {
                     } else {
                         $teacher = false;
                     }
+
+
                     $mailstudents = $plugin->get_config('mailstudents');
                     $mailteachers = $plugin->get_config('mailteachers');
                     $mailadmins = $plugin->get_config('mailadmins');
                     $shortname = format_string($course->shortname, true, array('context' => $context));
+
                     if (!empty($mailstudents)) {
                         $a = new stdClass();
                         $a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
                         $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
-
                         $eventdata = new \core\message\message();
                         $eventdata->courseid = $course->id;
                         $eventdata->modulename = 'moodle';
@@ -209,9 +213,9 @@ if (!$pfError && !$pfDone) {
                         message_send($eventdata);
                     }
                     if (!empty($mailteachers) && !empty($teacher)) {
+                        $a = new stdClass();
                         $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
                         $a->user = fullname($user);
-
                         $eventdata = new \core\message\message();
                         $eventdata->modulename = 'moodle';
                         $eventdata->component = 'enrol_paytm';
@@ -225,7 +229,9 @@ if (!$pfError && !$pfDone) {
                         $eventdata->smallmessage = '';
                         message_send($eventdata);
                     }
+                    
                     if (!empty($mailadmins)) {
+                        $a = new stdClass();
                         $a->course = format_string($course->fullname, true, array('context' => $coursecontext));
                         $a->user = fullname($user);
                         $admins = get_admins();
@@ -244,6 +250,8 @@ if (!$pfError && !$pfDone) {
                             message_send($eventdata);
                         }
                     }
+
+                   
                     $fullname = format_string($course->fullname, true, array('context' => $context));
                     $destination = "$CFG->wwwroot/course/view.php?id=$course->id";
                     redirect($destination, get_string('paymentthanks', '', $fullname));

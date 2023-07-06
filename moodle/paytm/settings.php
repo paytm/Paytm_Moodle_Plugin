@@ -37,9 +37,9 @@ if ($ADMIN->fulltree) {
     
 	$settings->add(new admin_setting_configtext('enrol_paytm/merchant_website', get_string( 'merchant_website', 'enrol_paytm'), get_string('merchant_website_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
 	
-	$settings->add(new admin_setting_configtext('enrol_paytm/merchant_industrytype', get_string( 'merchant_industrytype', 'enrol_paytm'), get_string('merchant_industrytype_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
+	/*$settings->add(new admin_setting_configtext('enrol_paytm/merchant_industrytype', get_string( 'merchant_industrytype', 'enrol_paytm'), get_string('merchant_industrytype_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));*/
 	
-	$settings->add(new admin_setting_configtext('enrol_paytm/merchant_channelid', get_string( 'merchant_channelid', 'enrol_paytm'), get_string('merchant_channelid_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));
+	/*$settings->add(new admin_setting_configtext('enrol_paytm/merchant_channelid', get_string( 'merchant_channelid', 'enrol_paytm'), get_string('merchant_channelid_desc', 'enrol_paytm'), '', PARAM_ALPHANUM));*/
 	
     //$settings->add(new admin_setting_configtext('enrol_paytm/merchant_passphrase', get_string('merchant_passphrase', 'enrol_payfast'), get_string('merchant_passphrase_desc', 'enrol_payfast'), '', '/^[a-zA-Z0-9-\(\)@.,_:#\/ ]*$/'));
 

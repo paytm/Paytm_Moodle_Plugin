@@ -260,6 +260,7 @@ class enrol_paytm_plugin extends enrol_plugin {
 
 
    private function blinkCheckoutSend($paramData = array(),$env_paytm=1){
+     global $CFG, $USER, $OUTPUT, $PAGE, $DB;
                     $paytmParams["body"] = array(
                     "requestType" => "Payment",
                     "mid" => $paramData["MID"],

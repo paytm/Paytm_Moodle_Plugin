@@ -13,7 +13,11 @@ The aim of this document is to explain the procedure of installation and configu
 - In moodle root folder navigate to "moodle > enrol" and paste the unzipped folder "paytm".
 - From the backend of your moodle site (administration), go to your module list (select "Site administration" -> Plugins -> Enrolments -> Paytm).
 - Locate the module "Paytm". 
+- Moodle supported versions 3.x and 4.x.
 
+## Developer Doc 
+
+URL : https://business.paytm.com/docs/moodle
 
 ## Configuration
 
@@ -32,3 +36,8 @@ The aim of this document is to explain the procedure of installation and configu
 		Transaction Status Url      => https://securegw.paytm.in/merchant-status/getTxnStatus
 
 See Video : https://www.youtube.com/watch?v=c4Y6RNlbg2c
+
+
+
+
+
