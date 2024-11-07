@@ -9,8 +9,8 @@
  * user.
  *
  * @package    enrol_paytm
- * @copyright 2020 Abhishek Awasthi
- * @author     Abhishek Awasthi - based on code by others
+ * @copyright 2020 IntegrationDev Paytm
+ * @author     IntegrationDev - based on code by others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 // Disable moodle specific debug messages and any errors in output,

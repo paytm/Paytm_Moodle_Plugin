@@ -216,7 +216,7 @@ class enrol_paytm_plugin extends enrol_plugin {
                 $userlastname = $USER->lastname;
                 $instancename = $this->get_instance_name($instance);
                 /*  /20Nov2020 */
-                // Abhishek Awasthi //
+                // IntegrationDev //
                 if ($this->get_config('paytm_mode') == 'live') {
                     $env_paytm=1;
                 } else {

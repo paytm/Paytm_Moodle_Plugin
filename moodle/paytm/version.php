@@ -19,13 +19,13 @@
  *
  * @package    enrol_paytm
  * @copyright  2020 Paytm
- * @author     Abhishek Awasthi
+ * @author     IntegrationDev
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023070521;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2024110721;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2016051900;        // Requires this Moodle version
 $plugin->component = 'enrol_paytm';    // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 60;

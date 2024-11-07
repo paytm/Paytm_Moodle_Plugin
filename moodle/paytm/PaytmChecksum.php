@@ -4,8 +4,8 @@
  * application and Paytm over network have not been tampered with. We use SHA256 hashing and 
  * AES128 encryption algorithm to ensure the safety of transaction data.
  *
- * @author     Lalit Kumar
- * @version    2.0
+ * @author     Integration Dev Paytm
+ * @version    2.0.2
  * @link       https://developer.paytm.com/docs/checksum/#php
  */
 
@@ -16,17 +16,10 @@ class PaytmChecksum{
 	static public function encrypt($input, $key) {
 		$key = html_entity_decode($key);
 
-		if(function_exists('openssl_encrypt')){
-			$data = openssl_encrypt ( $input , "AES-128-CBC" , $key, 0, self::$iv );
+		if (function_exists('openssl_encrypt')) {
+			$data = openssl_encrypt($input, "AES-128-CBC", $key, 0, self::$iv);
 		} else {
-			$size = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, 'cbc');
-			$input = self::pkcs5Pad($input, $size);
-			$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', 'cbc', '');
-			mcrypt_generic_init($td, $key, self::$iv);
-			$data = mcrypt_generic($td, $input);
-			mcrypt_generic_deinit($td);
-			mcrypt_module_close($td);
-			$data = base64_encode($data);
+			throw new Exception('OpenSSL extension is not available. Please install the OpenSSL extension.');
 		}
 		return $data;
 	}
@@ -37,22 +30,12 @@ class PaytmChecksum{
 		if(function_exists('openssl_decrypt')){
 			$data = openssl_decrypt ( $encrypted , "AES-128-CBC" , $key, 0, self::$iv );
 		} else {
-			$encrypted = base64_decode($encrypted);
-			$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', 'cbc', '');
-			mcrypt_generic_init($td, $key, self::$iv);
-			$data = mdecrypt_generic($td, $encrypted);
-			mcrypt_generic_deinit($td);
-			mcrypt_module_close($td);
-			$data = self::pkcs5Unpad($data);
-			$data = rtrim($data);
+			throw new Exception('OpenSSL extension is not available. Please install the OpenSSL extension.');
 		}
 		return $data;
 	}
 
 	static public function generateSignature($params, $key) {
-
-//echo "hi"; exit;
-
 		if(!is_array($params) && !is_string($params)){
 			throw new Exception("string or array expected, ".gettype($params)." given");			
 		}
@@ -63,9 +46,6 @@ class PaytmChecksum{
 	}
 
 	static public function verifySignature($params, $key, $checksum){
-
-		 
-
 		if(!is_array($params) && !is_string($params)){
 			throw new Exception("string or array expected, ".gettype($params)." given");
 		}
@@ -91,7 +71,7 @@ class PaytmChecksum{
 
 	static private function generateRandomString($length) {
 		$random = "";
-		srand((double) microtime() * 1000000);
+		//srand((double) microtime() * 1000000);
 
 		$data = "9876543210ZYXWVUTSRQPONMLKJIHGFEDCBAabcdefghijklmnopqrstuvwxyz!@#$&_";	
 

@@ -16,7 +16,7 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
  * 
- * @author     Abhishek Awasthi
+ * @author     IntegrationDev
  * @copyright  2009-2012 Paytm 
  * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
  */

@@ -4,7 +4,7 @@
     <p><?php print_string("paymentrequired") ?></p>
     <p><b><?php echo $instancename; ?></b></p>
     <p><b><?php echo get_string("cost").": {$instance->currency} {$localisedcost}"; ?></b></p>
-    <p><img width="300px" height="45px" alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="https://staticpg.paytm.in/pg_plugins_logo/paytm_logo_paymodes.svg" /></br>
+    <p><img width="300px" height="45px" alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="https://staticpg.paytmpayments.com/pg_plugins_logo/paytm_logo_paymodes.svg" /></br>
         <!-- <img alt="<?php print_string('paytmaccepted', 'enrol_paytm') ?>" src="<?php echo $CFG->wwwroot.'/enrol/paytm/paytm_detail.png'?>" /> -->
     </p>
     <p><?php print_string("paymentinstant") ?></p>
@@ -61,13 +61,16 @@
             '<div class="bounce5"></div>'+
             '</div>'+
             '<div class="paytm-overlay paytm-pg-loader"></div>';
-            jQuery('body').append(loaderhtml);
+            document.body.insertAdjacentHTML('beforeend', loaderhtml);
+
+           // jQuery('body').append(loaderhtml);
              if(document.getElementById("paytmError")!==null){ 
                  document.getElementById("paytmError").remove(); 
                 }
             var txn_token = '<?php echo $tnx_token; ?>';
             if(txn_token){
-               jQuery('.paytm-pg-loader').show();
+              // jQuery('.paytm-pg-loader').show();
+              document.querySelector('.paytm-pg-loader').style.display = 'block';
                 var config = {
                 "root": "",
                     "flow": "DEFAULT",
@@ -106,7 +109,8 @@
 
 
             }else{
-                jQuery("#JS_heckout").after('<p id="paytmError"></p>');
+               jQuery("#JS_heckout").after('<p id="paytmError"></p>');
+
                 document.getElementById("paytmError").innerHTML = "<?php echo $msg; ?>";
             }
 

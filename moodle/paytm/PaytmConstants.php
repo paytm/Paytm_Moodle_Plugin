@@ -3,8 +3,8 @@
 class PaytmConstants{
 	CONST INITIATE_TRANSACTION_URL		        = "theia/api/v1/initiateTransaction";
 	
-	CONST PRODUCTION_HOST						= "https://securegw.paytm.in/";
-	CONST STAGING_HOST							= "https://securegw-stage.paytm.in/";
+	CONST PRODUCTION_HOST						= "https://secure.paytmpayments.com/";
+	CONST STAGING_HOST							= "https://securestage.paytmpayments.com/";
 
 	CONST ORDER_STATUS_URL		                = "v3/order/status";
 	CONST CHECKOUT_JS_URL						= "merchantpgpui/checkoutjs/merchants/MID.js";
@@ -69,7 +69,7 @@ class PaytmConstants{
 	CONST ERROR_CURL_DISABLED				= "cURL is not enabled properly. Please verify.";
 	CONST ERROR_CURL_WARNING				= "Your server is unable to connect with us. Please contact to Paytm Support.";
 
-	CONST PLUGIN_VERSION						= "2.0";
+	CONST PLUGIN_VERSION						= "2.1";
 
 
 
